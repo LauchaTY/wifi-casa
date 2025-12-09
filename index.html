@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WiFi de Casa | Conexión QR</title>
+    <meta name="description" content="Conéctate al WiFi de casa fácilmente con código QR dinámico">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/style.css">
+    
+    <!-- Librerías externas -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <div class="wifi-card">
+            <div class="header">
+                <i class="fas fa-wifi"></i>
+                <h1>WiFi de Casa</h1>
+                <p>Escanea el QR para conectarte</p>
+            </div>
+            
+            <div class="wifi-info">
+                <div class="info-item">
+                    <div class="info-icon">
+                        <i class="fas fa-network-wired"></i>
+                    </div>
+                    <div class="info-content">
+                        <h3>Nombre de la Red</h3>
+                        <p id="ssid">MiCasa_WiFi</p>
+                    </div>
+                </div>
+                
+                <div class="info-item">
+                    <div class="info-icon">
+                        <i class="fas fa-key"></i>
+                    </div>
+                    <div class="info-content">
+                        <h3>Contraseña</h3>
+                        <p id="password">Contraseña123</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="qr-section">
+                <h3 class="qr-title">Código QR</h3>
+                <div id="qrcode"></div>
+            </div>
+            
+            <div class="buttons">
+                <button class="btn btn-primary" id="connectBtn">
+                    <i class="fas fa-plug"></i> Conectar
+                </button>
+                <button class="btn btn-secondary" id="showPasswordBtn">
+                    <i class="fas fa-eye"></i> Ver Contraseña
+                </button>
+            </div>
+            
+            <div class="notes">
+                <div class="note">
+                    <i class="fas fa-info-circle"></i>
+                    <span>QR dinámico - Se actualiza automáticamente</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>QR Master WiFi | <span id="currentDate"></span></p>
+        </div>
+    </div>
+    
+    <div class="modal" id="passwordModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Contraseña WiFi</h3>
+                <button class="close-modal" id="closeModal">&times;</button>
+            </div>
+            <div class="password-display">
+                <p id="modalPassword"></p>
+            </div>
+            <div class="modal-buttons">
+                <button class="modal-btn copy" id="copyPasswordBtn">
+                    <i class="fas fa-copy"></i> Copiar
+                </button>
+                <button class="modal-btn close" id="closeModalBtn">
+                    Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="copied-message" id="copiedMessage">
+        <i class="fas fa-check-circle"></i>
+        <span>¡Copiado!</span>
+    </div>
+    
+    <!-- JavaScript -->
+    <script src="js/script.js"></script>
+</body>
+</html>
