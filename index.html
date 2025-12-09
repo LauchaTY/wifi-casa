@@ -3,210 +3,204 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WiFi de Casa | Conexión con QR</title>
-    <meta name="description" content="Conéctate fácilmente al WiFi escaneando el código QR">
+    <title>WiFi Geek | Conexión QR</title>
+    <meta name="description" content="Conéctate al WiFi con estilo geek/anime">
     
-    <!-- Favicon como SVG inline para evitar error 404 -->
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📶</text></svg>">
+    <!-- Favicon geek -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>👨‍💻</text></svg>">
     
     <!-- CSS -->
     <link rel="stylesheet" href="css/style.css">
     
-    <!-- Fuentes de Google -->
+    <!-- Fuentes geek/anime -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Press+Start+2P&family=Share+Tech+Mono&family=Ubuntu+Mono:wght@400;700&display=swap" rel="stylesheet">
     
-    <!-- Font Awesome para iconos -->
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <!-- Librería QRCode -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
 <body>
-    <div class="container">
-        <div class="wifi-card">
-            <!-- Encabezado -->
-            <div class="header">
-                <div class="wifi-icon">
-                    <i class="fas fa-wifi"></i>
+    <!-- Fondo anime con partículas -->
+    <div class="anime-background">
+        <div class="particles"></div>
+        <div class="glitch-overlay"></div>
+    </div>
+    
+    <!-- Contenedor principal -->
+    <div class="geek-container">
+        <!-- Tarjeta geek/anime -->
+        <div class="geek-card">
+            <!-- Logo y título -->
+            <div class="geek-header">
+                <div class="logo-container">
+                    <img src="assets/logo.png" alt="Logo Geek" class="geek-logo" id="geek-logo">
+                    <div class="logo-glow"></div>
                 </div>
-                <h1>Conexión WiFi Casa</h1>
-                <p class="subtitle">Escanea el código QR para conectarte automáticamente</p>
-            </div>
-            
-            <!-- Información del WiFi -->
-            <div class="wifi-info-section">
-                <div class="info-box">
-                    <div class="info-row">
-                        <div class="info-label">
-                            <i class="fas fa-network-wired"></i>
-                            <span>Nombre de la Red</span>
-                        </div>
-                        <div class="info-value" id="ssid-display">
-                            LuffyNakamas
-                        </div>
-                    </div>
-                    
-                    <div class="info-row">
-                        <div class="info-label">
-                            <i class="fas fa-key"></i>
-                            <span>Contraseña</span>
-                        </div>
-                        <div class="info-value" id="password-display">
-                            4231150aA
-                        </div>
-                    </div>
-                    
-                    <div class="info-row">
-                        <div class="info-label">
-                            <i class="fas fa-shield-alt"></i>
-                            <span>Tipo de Seguridad</span>
-                        </div>
-                        <div class="info-value">
-                            WPA2
-                        </div>
-                    </div>
+                <h1 class="geek-title">
+                    <span class="title-text">ACCESS POINT</span>
+                    <span class="title-sub">WiFi CONNECTION</span>
+                </h1>
+                <div class="terminal-line">
+                    <span class="prompt">$</span>
+                    <span class="command">connect_wifi --qr-scan</span>
+                    <span class="cursor">█</span>
                 </div>
             </div>
             
-            <!-- Código QR -->
-            <div class="qr-section">
-                <h3><i class="fas fa-qrcode"></i> Código QR de Conexión</h3>
-                <div id="qrcode-container">
-                    <div id="qrcode"></div>
+            <!-- QR Code - CENTRO DE LA PANTALLA -->
+            <div class="qr-master">
+                <div class="qr-frame">
+                    <div class="qr-container" id="qrcode"></div>
+                    <div class="qr-glow"></div>
+                    <div class="qr-scan-line"></div>
                 </div>
-                <p class="qr-hint">Usa la cámara de tu teléfono para escanear</p>
+                <div class="qr-instructions">
+                    <p class="scan-text">
+                        <i class="fas fa-camera"></i> SCAN TO CONNECT
+                    </p>
+                    <p class="geek-note">
+                        <code>// QR_DYNAMIC.v2.0 - AUTO_UPDATE</code>
+                    </p>
+                </div>
             </div>
             
-            <!-- Botones de Acción -->
-            <div class="action-buttons">
-                <button class="btn btn-connect" id="connect-btn">
-                    <i class="fas fa-plug"></i>
-                    <span>Conectar al WiFi</span>
+            <!-- Información minimalista oculta inicialmente -->
+            <div class="hidden-info" id="hidden-info">
+                <div class="info-terminal">
+                    <div class="terminal-header">
+                        <div class="terminal-dots">
+                            <span class="dot red"></span>
+                            <span class="dot yellow"></span>
+                            <span class="dot green"></span>
+                        </div>
+                        <span class="terminal-title">wifi_config.ini</span>
+                    </div>
+                    <div class="terminal-content">
+                        <pre><code>SSID="<span id="info-ssid">LuffyNakamas</span>"
+PASS="<span id="info-password">4231150aA</span>"
+ENCRYPTION=WPA2
+HIDDEN=false
+LAST_UPDATE=2025-12-09</code></pre>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Botones minimalistas -->
+            <div class="geek-controls">
+                <button class="geek-btn glitch-btn" id="toggle-info-btn" data-text="SHOW_CONFIG">
+                    <i class="fas fa-terminal"></i>
+                    <span>SHOW_CONFIG</span>
+                    <span class="glitch-text">SHOW_CONFIG</span>
                 </button>
                 
-                <button class="btn btn-password" id="show-password-btn">
-                    <i class="fas fa-eye"></i>
-                    <span>Ver Contraseña</span>
+                <button class="geek-btn connect-btn" id="connect-btn" data-text="AUTO_CONNECT">
+                    <i class="fas fa-satellite-dish"></i>
+                    <span>AUTO_CONNECT</span>
                 </button>
                 
-                <button class="btn btn-copy" id="copy-btn">
-                    <i class="fas fa-copy"></i>
-                    <span>Copiar Datos</span>
+                <button class="geek-btn copy-btn" id="copy-btn" data-text="COPY_DATA">
+                    <i class="fas fa-clipboard"></i>
+                    <span>COPY_DATA</span>
                 </button>
             </div>
             
-            <!-- Instrucciones -->
-            <div class="instructions">
-                <div class="instruction-item">
-                    <i class="fas fa-sync-alt"></i>
-                    <div>
-                        <h4>QR Dinámico</h4>
-                        <p>Si cambias la contraseña, se actualiza aquí automáticamente.</p>
-                    </div>
-                </div>
-                
-                <div class="instruction-item">
-                    <i class="fas fa-mobile-alt"></i>
-                    <div>
-                        <h4>Uso en Móvil</h4>
-                        <p>En Android, el botón "Conectar" abre la configuración automáticamente.</p>
-                    </div>
-                </div>
-                
-                <div class="instruction-item">
-                    <i class="fas fa-print"></i>
-                    <div>
-                        <h4>QR Físico</h4>
-                        <p>Imprime este QR una vez y pégalo en un lugar visible de tu casa.</p>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Estado -->
-            <div class="status-bar">
-                <div class="status-item">
-                    <span class="status-label">Estado:</span>
+            <!-- Estado del sistema -->
+            <div class="system-status">
+                <div class="status-line">
+                    <span class="status-label">STATUS:</span>
                     <span class="status-value online">
-                        <i class="fas fa-circle"></i> Página activa
+                        <span class="pulse-dot"></span>
+                        SYSTEM_ACTIVE
                     </span>
                 </div>
-                <div class="status-item">
-                    <span class="status-label">Actualizado:</span>
-                    <span class="status-value" id="last-updated">
-                        <!-- Se llena con JavaScript -->
-                    </span>
+                <div class="status-line">
+                    <span class="status-label">MODE:</span>
+                    <span class="status-value">STEALTH_QR_ONLY</span>
+                </div>
+                <div class="hacker-text" id="hacker-text">
+                    <span>// INITIALIZING_CONNECTION_MATRIX...</span>
+                </div>
+            </div>
+            
+            <!-- Easter egg para geeks -->
+            <div class="easter-egg">
+                <div class="keyboard">
+                    <kbd>CTRL</kbd> + <kbd>ALT</kbd> + <kbd>W</kbd> 
+                    <span class="egg-text">for WiFi menu</span>
                 </div>
             </div>
         </div>
         
-        <!-- Pie de página -->
-        <footer class="footer">
-            <p>
-                <i class="fas fa-home"></i> WiFi QR Master v2.0 | 
-                <a href="#" id="refresh-link">
-                    <i class="fas fa-redo"></i> Actualizar página
-                </a> | 
-                <span id="page-views">Visitante #<span id="visitor-count">1</span></span>
-            </p>
-            <p class="footer-note">
-                Esta página se actualiza automáticamente cuando cambias la contraseña del WiFi.
-            </p>
+        <!-- Footer geek -->
+        <footer class="geek-footer">
+            <div class="footer-content">
+                <p class="footer-line">
+                    <span class="footer-label">[WiFi_QR_MASTER]</span>
+                    <span class="footer-value">v3.14</span>
+                </p>
+                <p class="footer-line">
+                    <span class="footer-label">[USER]</span>
+                    <span class="footer-value">lauchaty</span>
+                </p>
+                <p class="footer-line">
+                    <span class="footer-label">[UPTIME]</span>
+                    <span class="footer-value" id="uptime">00:00:00</span>
+                </p>
+            </div>
+            <div class="matrix-rain" id="matrix-rain"></div>
         </footer>
     </div>
     
-    <!-- Modal para Contraseña -->
-    <div class="modal-overlay" id="password-modal">
-        <div class="modal">
+    <!-- Notificación estilo terminal -->
+    <div class="terminal-notification" id="notification">
+        <div class="notification-content">
+            <span class="notification-prompt">></span>
+            <span class="notification-text" id="notification-text"></span>
+            <span class="blinking-cursor">_</span>
+        </div>
+    </div>
+    
+    <!-- Modal para copiar (oculto) -->
+    <div class="geek-modal" id="copy-modal">
+        <div class="modal-content">
             <div class="modal-header">
-                <h3><i class="fas fa-key"></i> Contraseña del WiFi</h3>
+                <h3><i class="fas fa-code"></i> COPY_DATA</h3>
                 <button class="modal-close" id="close-modal">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
-            
-            <div class="modal-content">
-                <div class="password-display-modal">
-                    <div class="password-field">
-                        <label>Nombre de Red (SSID):</label>
-                        <div class="password-value" id="modal-ssid">
-                            <!-- Se llena con JavaScript -->
-                        </div>
-                    </div>
-                    
-                    <div class="password-field">
-                        <label>Contraseña:</label>
-                        <div class="password-value password-highlight" id="modal-password">
-                            <!-- Se llena con JavaScript -->
-                        </div>
-                    </div>
+            <div class="modal-body">
+                <div class="code-block">
+                    <pre><code id="copy-code">SSID: LuffyNakamas
+PASSWORD: 4231150aA
+ENCRYPTION: WPA2</code></pre>
                 </div>
-                
                 <div class="modal-actions">
-                    <button class="modal-btn btn-copy-password" id="copy-password-btn">
-                        <i class="fas fa-copy"></i> Copiar Contraseña
+                    <button class="modal-btn" id="copy-ssid-btn">
+                        <i class="fas fa-copy"></i> COPY_SSID
                     </button>
-                    <button class="modal-btn btn-copy-all" id="copy-all-btn">
-                        <i class="fas fa-copy"></i> Copiar Todo
+                    <button class="modal-btn" id="copy-pass-btn">
+                        <i class="fas fa-copy"></i> COPY_PASS
                     </button>
-                    <button class="modal-btn btn-close-modal" id="close-modal-btn">
-                        <i class="fas fa-times"></i> Cerrar
+                    <button class="modal-btn" id="copy-all-modal-btn">
+                        <i class="fas fa-copy"></i> COPY_ALL
                     </button>
                 </div>
             </div>
         </div>
     </div>
     
-    <!-- Notificación -->
-    <div class="notification" id="notification">
-        <div class="notification-content">
-            <i class="fas fa-check-circle"></i>
-            <span id="notification-text">¡Contraseña copiada al portapapeles!</span>
-        </div>
-    </div>
-    
-    <!-- JavaScript -->
+    <!-- Scripts -->
     <script src="js/script.js"></script>
+    
+    <!-- Efectos de sonido opcionales (comentados) -->
+    <!--
+    <audio id="click-sound" src="assets/click.wav" preload="auto"></audio>
+    <audio id="terminal-sound" src="assets/terminal.wav" preload="auto"></audio>
+    -->
 </body>
 </html>

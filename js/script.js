@@ -1,22 +1,27 @@
-// js/script.js
+// js/script.js - VERSIÓN ANIME/GEEK
 
 // ===== CONFIGURACIÓN DEL WIFI =====
-// ¡¡¡IMPORTANTE!!! ESTOS SON TUS DATOS REALES
 const WIFI_CONFIG = {
-    ssid: "LuffyNakamas",           // Nombre de tu red WiFi (SSID)
+    ssid: "LuffyNakamas",           // Nombre de tu red WiFi
     password: "4231150aA",          // Contraseña de tu WiFi
-    encryption: "WPA2",             // Tipo de encriptación (WPA, WPA2, WEP)
-    hidden: false,                  // ¿La red está oculta? (true/false)
-    lastUpdated: "2025-12-09"       // Fecha de última actualización
+    encryption: "WPA2",             // Tipo de encriptación
+    hidden: false,                  // ¿La red está oculta?
+    lastUpdated: "2025-12-09",      // Fecha de actualización
+    version: "QR_MASTER_v3.14"      // Versión del sistema
 };
 
 // ===== VARIABLES GLOBALES =====
 let elements = {};
-let visitorCount = localStorage.getItem('wifiVisitorCount') || 1;
+let uptimeInterval;
+let startTime = Date.now();
+let isInfoVisible = false;
 
 // ===== INICIALIZACIÓN =====
 document.addEventListener('DOMContentLoaded', function() {
-    // Inicializar referencias a elementos DOM
+    console.log('%c🚀 WiFi QR Master v3.14 🚀', 'color: #00f3ff; font-size: 16px; font-weight: bold;');
+    console.log('%c// SYSTEM INITIALIZED //', 'color: #00ff9d;');
+    
+    // Inicializar elementos
     initializeElements();
     
     // Configurar datos iniciales
@@ -28,276 +33,412 @@ document.addEventListener('DOMContentLoaded', function() {
     // Generar código QR
     generateQRCode();
     
-    // Inicializar contador de visitas
-    initializeVisitorCount();
+    // Iniciar efectos
+    startEffects();
+    
+    // Iniciar contador de uptime
+    startUptimeCounter();
 });
 
 // ===== FUNCIONES DE INICIALIZACIÓN =====
 function initializeElements() {
     // Elementos principales
     elements = {
-        // Display elements
-        ssidDisplay: document.getElementById('ssid-display'),
-        passwordDisplay: document.getElementById('password-display'),
-        lastUpdated: document.getElementById('last-updated'),
-        visitorCount: document.getElementById('visitor-count'),
+        // Elementos de información
+        infoSsid: document.getElementById('info-ssid'),
+        infoPassword: document.getElementById('info-password'),
+        hiddenInfo: document.getElementById('hidden-info'),
+        hackerText: document.getElementById('hacker-text'),
+        uptime: document.getElementById('uptime'),
         
         // Botones
+        toggleInfoBtn: document.getElementById('toggle-info-btn'),
         connectBtn: document.getElementById('connect-btn'),
-        showPasswordBtn: document.getElementById('show-password-btn'),
         copyBtn: document.getElementById('copy-btn'),
-        refreshLink: document.getElementById('refresh-link'),
         
-        // Modal elements
-        passwordModal: document.getElementById('password-modal'),
-        modalSsid: document.getElementById('modal-ssid'),
-        modalPassword: document.getElementById('modal-password'),
+        // Modal
+        copyModal: document.getElementById('copy-modal'),
         closeModal: document.getElementById('close-modal'),
-        closeModalBtn: document.getElementById('close-modal-btn'),
-        copyPasswordBtn: document.getElementById('copy-password-btn'),
-        copyAllBtn: document.getElementById('copy-all-btn'),
+        copyCode: document.getElementById('copy-code'),
+        copySsidBtn: document.getElementById('copy-ssid-btn'),
+        copyPassBtn: document.getElementById('copy-pass-btn'),
+        copyAllModalBtn: document.getElementById('copy-all-modal-btn'),
         
         // Notificación
         notification: document.getElementById('notification'),
-        notificationText: document.getElementById('notification-text')
+        notificationText: document.getElementById('notification-text'),
+        
+        // Logo
+        geekLogo: document.getElementById('geek-logo')
     };
 }
 
 function setupInitialData() {
-    // Mostrar datos del WiFi
-    elements.ssidDisplay.textContent = WIFI_CONFIG.ssid;
-    elements.passwordDisplay.textContent = WIFI_CONFIG.password;
-    elements.modalSsid.textContent = WIFI_CONFIG.ssid;
-    elements.modalPassword.textContent = WIFI_CONFIG.password;
+    // Mostrar datos en la información oculta
+    elements.infoSsid.textContent = WIFI_CONFIG.ssid;
+    elements.infoPassword.textContent = WIFI_CONFIG.password;
     
-    // Mostrar fecha de última actualización
-    const lastUpdated = new Date(WIFI_CONFIG.lastUpdated);
-    const options = { 
-        year: 'numeric', 
-        month: 'long', 
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-    };
-    elements.lastUpdated.textContent = lastUpdated.toLocaleDateString('es-ES', options);
+    // Configurar texto para copiar
+    elements.copyCode.textContent = `SSID: ${WIFI_CONFIG.ssid}\nPASSWORD: ${WIFI_CONFIG.password}\nENCRYPTION: ${WIFI_CONFIG.encryption}`;
+    
+    // Efecto de texto hacker
+    startHackerText();
 }
 
 function setupEventListeners() {
+    // Botón mostrar/ocultar información
+    elements.toggleInfoBtn.addEventListener('click', toggleInfo);
+    
     // Botón conectar
     elements.connectBtn.addEventListener('click', connectToWifi);
     
-    // Botón mostrar contraseña (abrir modal)
-    elements.showPasswordBtn.addEventListener('click', openPasswordModal);
-    
-    // Botón copiar datos
-    elements.copyBtn.addEventListener('click', copyAllData);
-    
-    // Enlace actualizar página
-    elements.refreshLink.addEventListener('click', function(e) {
-        e.preventDefault();
-        location.reload();
-    });
+    // Botón copiar (abre modal)
+    elements.copyBtn.addEventListener('click', openCopyModal);
     
     // Modal: cerrar
-    elements.closeModal.addEventListener('click', closePasswordModal);
-    elements.closeModalBtn.addEventListener('click', closePasswordModal);
+    elements.closeModal.addEventListener('click', closeCopyModal);
+    
+    // Modal: copiar SSID
+    elements.copySsidBtn.addEventListener('click', function() {
+        copyToClipboard(WIFI_CONFIG.ssid, 'SSID copiado al portapapeles');
+    });
     
     // Modal: copiar contraseña
-    elements.copyPasswordBtn.addEventListener('click', copyPassword);
+    elements.copyPassBtn.addEventListener('click', function() {
+        copyToClipboard(WIFI_CONFIG.password, 'Contraseña copiada al portapapeles');
+    });
     
     // Modal: copiar todo
-    elements.copyAllBtn.addEventListener('click', copyAllData);
+    elements.copyAllModalBtn.addEventListener('click', function() {
+        const text = `SSID: ${WIFI_CONFIG.ssid}\nPASSWORD: ${WIFI_CONFIG.password}`;
+        copyToClipboard(text, 'Todos los datos copiados');
+    });
     
     // Cerrar modal al hacer clic fuera
-    elements.passwordModal.addEventListener('click', function(e) {
-        if (e.target === elements.passwordModal) {
-            closePasswordModal();
+    elements.copyModal.addEventListener('click', function(e) {
+        if (e.target === elements.copyModal) {
+            closeCopyModal();
         }
     });
     
-    // Cerrar modal con tecla Escape
+    // Tecla Escape para cerrar modal
     document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape' && elements.passwordModal.style.display === 'flex') {
-            closePasswordModal();
+        if (e.key === 'Escape') {
+            closeCopyModal();
+        }
+        
+        // Easter egg: CTRL+ALT+W
+        if (e.ctrlKey && e.altKey && e.key === 'w') {
+            e.preventDefault();
+            showNotification('// WiFi_MENU_ACTIVATED //', 'success');
         }
     });
+    
+    // Efecto hover en logo
+    if (elements.geekLogo) {
+        elements.geekLogo.addEventListener('mouseenter', function() {
+            this.style.transform = 'scale(1.1) rotate(10deg)';
+            this.style.boxShadow = '0 0 30px #ff00ff';
+        });
+        
+        elements.geekLogo.addEventListener('mouseleave', function() {
+            this.style.transform = '';
+            this.style.boxShadow = '';
+        });
+    }
 }
 
 // ===== FUNCIONES DEL CÓDIGO QR =====
 function generateQRCode() {
-    // Crear string para código QR en formato estándar WiFi
+    // Crear string para código QR
     const wifiString = `WIFI:S:${WIFI_CONFIG.ssid};T:${WIFI_CONFIG.encryption};P:${WIFI_CONFIG.password};H:${WIFI_CONFIG.hidden};;`;
     
     // Limpiar contenedor si ya existe un QR
     const qrContainer = document.getElementById('qrcode');
     qrContainer.innerHTML = '';
     
-    // Generar nuevo código QR
+    // Generar nuevo código QR con estilo
     new QRCode(qrContainer, {
         text: wifiString,
-        width: 220,
-        height: 220,
-        colorDark: "#1F2937",
-        colorLight: "#FFFFFF",
+        width: 250,
+        height: 250,
+        colorDark: "#00ff9d",
+        colorLight: "transparent",
         correctLevel: QRCode.CorrectLevel.H
     });
+    
+    // Aplicar efectos al QR generado
+    setTimeout(applyQREffects, 100);
+}
+
+function applyQREffects() {
+    const qrCanvas = document.querySelector('#qrcode canvas');
+    if (qrCanvas) {
+        qrCanvas.style.borderRadius = '10px';
+        qrCanvas.style.boxShadow = '0 0 20px #00ff9d';
+    }
 }
 
 // ===== FUNCIONES DE CONEXIÓN =====
 function connectToWifi() {
+    // Efecto visual
+    elements.connectBtn.style.animation = 'glitchEffect 0.3s';
+    setTimeout(() => {
+        elements.connectBtn.style.animation = '';
+    }, 300);
+    
     const userAgent = navigator.userAgent || navigator.vendor || window.opera;
     const isAndroid = /android/i.test(userAgent);
     const isIOS = /iPad|iPhone|iPod/.test(userAgent) && !window.MSStream;
     
+    showNotification('// INITIATING_CONNECTION //', 'info');
+    
     if (isAndroid) {
-        // Intentar abrir configuración WiFi en Android
+        // Android: intent de conexión
         try {
             const intentURL = `intent://wifi?ssid=${encodeURIComponent(WIFI_CONFIG.ssid)}&password=${encodeURIComponent(WIFI_CONFIG.password)}#Intent;scheme=android-intent;package=com.android.settings;end`;
             window.location.href = intentURL;
             
-            // Fallback si el intent falla
-            setTimeout(function() {
-                if (document.hasFocus()) {
-                    showManualConnectionInstructions();
-                }
-            }, 1000);
+            setTimeout(() => {
+                showNotification('// CONNECTION_INTENT_SENT //', 'success');
+            }, 500);
             
         } catch (error) {
-            console.error('Error con Android Intent:', error);
-            showManualConnectionInstructions();
+            console.error('Connection error:', error);
+            showManualInstructions();
         }
-    } else if (isIOS) {
-        // iOS no soporta intents directos, mostrar instrucciones
-        showManualConnectionInstructions();
     } else {
-        // Navegador de escritorio
-        showManualConnectionInstructions();
+        // iOS y otros: instrucciones manuales
+        showManualInstructions();
     }
 }
 
-function showManualConnectionInstructions() {
-    const message = `Para conectarte manualmente:\n\n1. Ve a Configuración > WiFi\n2. Busca la red: "${WIFI_CONFIG.ssid}"\n3. Ingresa la contraseña: "${WIFI_CONFIG.password}"\n\nO escanea el código QR con tu cámara.`;
-    alert(message);
+function showManualInstructions() {
+    const message = `📱 MANUAL CONNECTION:\n\n1. Go to Settings > WiFi\n2. Find: "${WIFI_CONFIG.ssid}"\n3. Password: "${WIFI_CONFIG.password}"\n\nOr scan the QR code.`;
+    showNotification(message, 'info');
+    
+    // Mostrar modal con información
+    setTimeout(() => {
+        toggleInfo();
+    }, 1000);
 }
 
-// ===== FUNCIONES DEL MODAL =====
-function openPasswordModal() {
-    elements.passwordModal.style.display = 'flex';
-    document.body.style.overflow = 'hidden';
+// ===== FUNCIONES DE INTERFAZ =====
+function toggleInfo() {
+    isInfoVisible = !isInfoVisible;
+    elements.hiddenInfo.classList.toggle('active', isInfoVisible);
+    
+    // Cambiar texto del botón
+    const btnText = elements.toggleInfoBtn.querySelector('span');
+    btnText.textContent = isInfoVisible ? 'HIDE_CONFIG' : 'SHOW_CONFIG';
+    
+    // Efecto de sonido visual
+    if (isInfoVisible) {
+        showNotification('// CONFIG_DISPLAYED //', 'success');
+    }
 }
 
-function closePasswordModal() {
-    elements.passwordModal.style.display = 'none';
-    document.body.style.overflow = 'auto';
+function openCopyModal() {
+    elements.copyModal.style.display = 'flex';
+    showNotification('// COPY_INTERFACE_ACTIVE //', 'info');
+}
+
+function closeCopyModal() {
+    elements.copyModal.style.display = 'none';
 }
 
 // ===== FUNCIONES DE PORTAPAPELES =====
-function copyPassword() {
-    copyToClipboard(WIFI_CONFIG.password, 'Contraseña copiada al portapapeles');
-    closePasswordModal();
-}
-
-function copyAllData() {
-    const textToCopy = `Red WiFi: ${WIFI_CONFIG.ssid}\nContraseña: ${WIFI_CONFIG.password}`;
-    copyToClipboard(textToCopy, 'Datos del WiFi copiados al portapapeles');
-}
-
 function copyToClipboard(text, successMessage) {
     navigator.clipboard.writeText(text).then(
         () => {
-            showNotification(successMessage, 'success');
+            showNotification(`// ${successMessage.toUpperCase()} //`, 'success');
+            closeCopyModal();
+            
+            // Efecto visual
+            document.body.style.filter = 'brightness(1.2)';
+            setTimeout(() => {
+                document.body.style.filter = '';
+            }, 200);
         },
         (err) => {
-            console.error('Error al copiar: ', err);
+            console.error('Copy error:', err);
+            showNotification('// COPY_FAILED - TRY_MANUAL //', 'error');
+            
             // Fallback para navegadores antiguos
             const textArea = document.createElement('textarea');
             textArea.value = text;
             document.body.appendChild(textArea);
             textArea.select();
+            
             try {
                 document.execCommand('copy');
-                showNotification(successMessage, 'success');
+                showNotification(`// ${successMessage.toUpperCase()} //`, 'success');
             } catch (err) {
-                showNotification('Error al copiar. Copia manualmente.', 'error');
+                showNotification('// COPY_ERROR - USE_CTRL+C //', 'error');
             }
+            
             document.body.removeChild(textArea);
+            closeCopyModal();
         }
     );
 }
 
-function showNotification(message, type) {
+// ===== NOTIFICACIONES =====
+function showNotification(message, type = 'info') {
     elements.notificationText.textContent = message;
     elements.notification.style.display = 'flex';
     
-    // Cambiar color según tipo
-    if (type === 'error') {
-        elements.notification.style.backgroundColor = '#EF4444';
-    } else {
-        elements.notification.style.backgroundColor = '#10B981';
+    // Estilo según tipo
+    switch(type) {
+        case 'success':
+            elements.notification.style.borderColor = '#00ff9d';
+            elements.notification.style.color = '#00ff9d';
+            break;
+        case 'error':
+            elements.notification.style.borderColor = '#ff0055';
+            elements.notification.style.color = '#ff0055';
+            break;
+        default:
+            elements.notification.style.borderColor = '#00f3ff';
+            elements.notification.style.color = '#00f3ff';
     }
     
+    // Ocultar después de 3 segundos
     setTimeout(() => {
         elements.notification.style.display = 'none';
     }, 3000);
 }
 
-function initializeVisitorCount() {
-    // Incrementar contador de visitas
-    visitorCount = parseInt(visitorCount) + 1;
-    localStorage.setItem('wifiVisitorCount', visitorCount);
-    elements.visitorCount.textContent = visitorCount;
+// ===== EFECTOS ESPECIALES =====
+function startEffects() {
+    // Efecto de partículas en el footer
+    createMatrixRain();
+    
+    // Efecto de parpadeo aleatorio
+    setInterval(randomGlitch, 5000);
 }
 
-// ===== FUNCIONES ADICIONALES =====
-// Función para actualizar datos WiFi (para uso futuro)
-function updateWifiData(newSsid, newPassword, newEncryption) {
-    // Actualizar configuración
-    WIFI_CONFIG.ssid = newSsid;
-    WIFI_CONFIG.password = newPassword;
-    if (newEncryption) {
-        WIFI_CONFIG.encryption = newEncryption;
+function startHackerText() {
+    const messages = [
+        "// INITIALIZING_CONNECTION_MATRIX...",
+        "// LOADING_WIFI_PROTOCOLS...",
+        "// SCANNING_QR_DATASTREAM...",
+        "// ENCRYPTION: WPA2_ACTIVE...",
+        "// READY_FOR_CONNECTION..."
+    ];
+    
+    let index = 0;
+    
+    function changeText() {
+        elements.hackerText.innerHTML = `<span class="typing">${messages[index]}</span>`;
+        index = (index + 1) % messages.length;
     }
-    WIFI_CONFIG.lastUpdated = new Date().toISOString().split('T')[0];
     
-    // Actualizar display
-    setupInitialData();
-    
-    // Regenerar QR
-    generateQRCode();
-    
-    // Mostrar notificación
-    showNotification('Datos WiFi actualizados correctamente', 'success');
-    
-    return true;
+    // Cambiar texto cada 3 segundos
+    changeText();
+    setInterval(changeText, 3000);
 }
 
-// Función para imprimir la página
-function printPage() {
-    window.print();
-}
-
-// Función para descargar QR como imagen
-function downloadQRCode() {
-    const qrCanvas = document.querySelector('#qrcode canvas');
-    if (qrCanvas) {
-        const link = document.createElement('a');
-        link.download = `QR-WiFi-${WIFI_CONFIG.ssid}.png`;
-        link.href = qrCanvas.toDataURL('image/png');
-        link.click();
+function createMatrixRain() {
+    const chars = "01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン";
+    const container = document.getElementById('matrix-rain');
+    
+    if (!container) return;
+    
+    // Crear múltiples líneas de "lluvia"
+    for (let i = 0; i < 20; i++) {
+        const line = document.createElement('div');
+        line.className = 'matrix-line';
+        line.style.position = 'absolute';
+        line.style.left = `${Math.random() * 100}%`;
+        line.style.width = '1px';
+        line.style.height = '100%';
+        line.style.background = 'linear-gradient(transparent, #00ff41, transparent)';
+        line.style.opacity = '0.1';
+        line.style.animation = `matrixFall ${2 + Math.random() * 3}s linear infinite`;
+        line.style.animationDelay = `${Math.random() * 2}s`;
+        container.appendChild(line);
     }
 }
 
-// Exponer funciones útiles para la consola
-window.wifiUtils = {
-    updateWifiData: updateWifiData,
-    printPage: printPage,
-    downloadQRCode: downloadQRCode,
+function randomGlitch() {
+    // Aplicar efecto glitch aleatorio a elementos
+    const glitchElements = document.querySelectorAll('.geek-card, .qr-frame');
+    if (glitchElements.length > 0 && Math.random() > 0.7) {
+        const element = glitchElements[Math.floor(Math.random() * glitchElements.length)];
+        element.style.animation = 'glitchEffect 0.1s';
+        setTimeout(() => {
+            element.style.animation = '';
+        }, 100);
+    }
+}
+
+// ===== CONTADOR DE UPTIME =====
+function startUptimeCounter() {
+    function updateUptime() {
+        const now = Date.now();
+        const diff = now - startTime;
+        
+        const hours = Math.floor(diff / (1000 * 60 * 60));
+        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+        
+        const timeString = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        
+        if (elements.uptime) {
+            elements.uptime.textContent = timeString;
+        }
+    }
+    
+    updateUptime();
+    uptimeInterval = setInterval(updateUptime, 1000);
+}
+
+// ===== FUNCIONES GLOBALES (para consola) =====
+window.wifiSystem = {
+    version: WIFI_CONFIG.version,
     getConfig: () => ({ ...WIFI_CONFIG }),
-    version: '2.0'
+    showInfo: toggleInfo,
+    connect: connectToWifi,
+    copyData: openCopyModal,
+    updateWifi: function(newSsid, newPassword) {
+        WIFI_CONFIG.ssid = newSsid;
+        WIFI_CONFIG.password = newPassword;
+        WIFI_CONFIG.lastUpdated = new Date().toISOString().split('T')[0];
+        
+        // Actualizar displays
+        setupInitialData();
+        generateQRCode();
+        
+        showNotification('// WIFI_CONFIG_UPDATED //', 'success');
+        return true;
+    },
+    emergencyRestart: function() {
+        location.reload();
+    }
 };
 
-// Verificar si hay errores en la carga
-window.addEventListener('error', function(e) {
-    console.error('Error detectado:', e.error);
-    showNotification('Error al cargar la página. Recarga por favor.', 'error');
+// Mensaje de bienvenida en consola
+console.log(`
+%c
+╔══════════════════════════════════════╗
+║      🚀 WIFI QR MASTER v3.14 🚀      ║
+║                                      ║
+║  Commands available:                 ║
+║  • wifiSystem.getConfig()            ║
+║  • wifiSystem.showInfo()             ║
+║  • wifiSystem.connect()              ║
+║  • wifiSystem.copyData()             ║
+║  • wifiSystem.updateWifi(ssid, pass) ║
+║                                      ║
+║  Type: wifiSystem for more info      ║
+╚══════════════════════════════════════╝
+`, 'color: #00f3ff; font-family: monospace;');
+
+// Prevenir que el usuario salga accidentalmente
+window.addEventListener('beforeunload', function(e) {
+    if (document.querySelector('.geek-modal[style*="display: flex"]')) {
+        e.preventDefault();
+        e.returnValue = 'Tienes una ventana abierta. ¿Seguro que quieres salir?';
+    }
 });
