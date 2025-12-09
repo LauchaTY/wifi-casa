@@ -1,11 +1,12 @@
 // js/script.js
 
 // Configuración del WiFi - ¡MODIFICA AQUÍ!
-const wifiConfig = {
-    ssid: "MiCasa_WiFi",
-    password: "Contraseña123",
-    encryption: "WPA/WPA2",
-    hidden: false
+const WIFI_CONFIG = {
+    ssid: "LuffyNakamas",             
+    password: "4231150aA",            
+    encryption: "WPA2",                
+    hidden: false,                     
+    lastUpdated: "2025-12-09"          
 };
 
 // Elementos del DOM
