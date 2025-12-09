@@ -3,101 +3,207 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WiFi de Casa | Conexión QR</title>
-    <meta name="description" content="Conéctate al WiFi de casa fácilmente con código QR dinámico">
+    <title>WiFi de Casa | Conexión con QR</title>
+    <meta name="description" content="Conéctate fácilmente al WiFi escaneando el código QR">
     
-    <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
+    <!-- Favicon como SVG inline para evitar error 404 -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📶</text></svg>">
     
     <!-- CSS -->
     <link rel="stylesheet" href="css/style.css">
     
-    <!-- Librerías externas -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Fuentes de Google -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome para iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Librería QRCode -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
 <body>
     <div class="container">
         <div class="wifi-card">
+            <!-- Encabezado -->
             <div class="header">
-                <i class="fas fa-wifi"></i>
-                <h1>WiFi de Casa</h1>
-                <p>Escanea el QR para conectarte</p>
+                <div class="wifi-icon">
+                    <i class="fas fa-wifi"></i>
+                </div>
+                <h1>Conexión WiFi Casa</h1>
+                <p class="subtitle">Escanea el código QR para conectarte automáticamente</p>
             </div>
             
-            <div class="wifi-info">
-                <div class="info-item">
-                    <div class="info-icon">
-                        <i class="fas fa-network-wired"></i>
+            <!-- Información del WiFi -->
+            <div class="wifi-info-section">
+                <div class="info-box">
+                    <div class="info-row">
+                        <div class="info-label">
+                            <i class="fas fa-network-wired"></i>
+                            <span>Nombre de la Red</span>
+                        </div>
+                        <div class="info-value" id="ssid-display">
+                            LuffyNakamas
+                        </div>
                     </div>
-                    <div class="info-content">
-                        <h3>Nombre de la Red</h3>
-                        <p id="ssid">MiCasa_WiFi</p>
+                    
+                    <div class="info-row">
+                        <div class="info-label">
+                            <i class="fas fa-key"></i>
+                            <span>Contraseña</span>
+                        </div>
+                        <div class="info-value" id="password-display">
+                            4231150aA
+                        </div>
+                    </div>
+                    
+                    <div class="info-row">
+                        <div class="info-label">
+                            <i class="fas fa-shield-alt"></i>
+                            <span>Tipo de Seguridad</span>
+                        </div>
+                        <div class="info-value">
+                            WPA2
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Código QR -->
+            <div class="qr-section">
+                <h3><i class="fas fa-qrcode"></i> Código QR de Conexión</h3>
+                <div id="qrcode-container">
+                    <div id="qrcode"></div>
+                </div>
+                <p class="qr-hint">Usa la cámara de tu teléfono para escanear</p>
+            </div>
+            
+            <!-- Botones de Acción -->
+            <div class="action-buttons">
+                <button class="btn btn-connect" id="connect-btn">
+                    <i class="fas fa-plug"></i>
+                    <span>Conectar al WiFi</span>
+                </button>
+                
+                <button class="btn btn-password" id="show-password-btn">
+                    <i class="fas fa-eye"></i>
+                    <span>Ver Contraseña</span>
+                </button>
+                
+                <button class="btn btn-copy" id="copy-btn">
+                    <i class="fas fa-copy"></i>
+                    <span>Copiar Datos</span>
+                </button>
+            </div>
+            
+            <!-- Instrucciones -->
+            <div class="instructions">
+                <div class="instruction-item">
+                    <i class="fas fa-sync-alt"></i>
+                    <div>
+                        <h4>QR Dinámico</h4>
+                        <p>Si cambias la contraseña, se actualiza aquí automáticamente.</p>
                     </div>
                 </div>
                 
-                <div class="info-item">
-                    <div class="info-icon">
-                        <i class="fas fa-key"></i>
+                <div class="instruction-item">
+                    <i class="fas fa-mobile-alt"></i>
+                    <div>
+                        <h4>Uso en Móvil</h4>
+                        <p>En Android, el botón "Conectar" abre la configuración automáticamente.</p>
                     </div>
-                    <div class="info-content">
-                        <h3>Contraseña</h3>
-                        <p id="password">Contraseña123</p>
+                </div>
+                
+                <div class="instruction-item">
+                    <i class="fas fa-print"></i>
+                    <div>
+                        <h4>QR Físico</h4>
+                        <p>Imprime este QR una vez y pégalo en un lugar visible de tu casa.</p>
                     </div>
                 </div>
             </div>
             
-            <div class="qr-section">
-                <h3 class="qr-title">Código QR</h3>
-                <div id="qrcode"></div>
-            </div>
-            
-            <div class="buttons">
-                <button class="btn btn-primary" id="connectBtn">
-                    <i class="fas fa-plug"></i> Conectar
-                </button>
-                <button class="btn btn-secondary" id="showPasswordBtn">
-                    <i class="fas fa-eye"></i> Ver Contraseña
-                </button>
-            </div>
-            
-            <div class="notes">
-                <div class="note">
-                    <i class="fas fa-info-circle"></i>
-                    <span>QR dinámico - Se actualiza automáticamente</span>
+            <!-- Estado -->
+            <div class="status-bar">
+                <div class="status-item">
+                    <span class="status-label">Estado:</span>
+                    <span class="status-value online">
+                        <i class="fas fa-circle"></i> Página activa
+                    </span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">Actualizado:</span>
+                    <span class="status-value" id="last-updated">
+                        <!-- Se llena con JavaScript -->
+                    </span>
                 </div>
             </div>
         </div>
         
-        <div class="footer">
-            <p>QR Master WiFi | <span id="currentDate"></span></p>
-        </div>
+        <!-- Pie de página -->
+        <footer class="footer">
+            <p>
+                <i class="fas fa-home"></i> WiFi QR Master v2.0 | 
+                <a href="#" id="refresh-link">
+                    <i class="fas fa-redo"></i> Actualizar página
+                </a> | 
+                <span id="page-views">Visitante #<span id="visitor-count">1</span></span>
+            </p>
+            <p class="footer-note">
+                Esta página se actualiza automáticamente cuando cambias la contraseña del WiFi.
+            </p>
+        </footer>
     </div>
     
-    <div class="modal" id="passwordModal">
-        <div class="modal-content">
+    <!-- Modal para Contraseña -->
+    <div class="modal-overlay" id="password-modal">
+        <div class="modal">
             <div class="modal-header">
-                <h3>Contraseña WiFi</h3>
-                <button class="close-modal" id="closeModal">&times;</button>
-            </div>
-            <div class="password-display">
-                <p id="modalPassword"></p>
-            </div>
-            <div class="modal-buttons">
-                <button class="modal-btn copy" id="copyPasswordBtn">
-                    <i class="fas fa-copy"></i> Copiar
+                <h3><i class="fas fa-key"></i> Contraseña del WiFi</h3>
+                <button class="modal-close" id="close-modal">
+                    <i class="fas fa-times"></i>
                 </button>
-                <button class="modal-btn close" id="closeModalBtn">
-                    Cerrar
-                </button>
+            </div>
+            
+            <div class="modal-content">
+                <div class="password-display-modal">
+                    <div class="password-field">
+                        <label>Nombre de Red (SSID):</label>
+                        <div class="password-value" id="modal-ssid">
+                            <!-- Se llena con JavaScript -->
+                        </div>
+                    </div>
+                    
+                    <div class="password-field">
+                        <label>Contraseña:</label>
+                        <div class="password-value password-highlight" id="modal-password">
+                            <!-- Se llena con JavaScript -->
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="modal-actions">
+                    <button class="modal-btn btn-copy-password" id="copy-password-btn">
+                        <i class="fas fa-copy"></i> Copiar Contraseña
+                    </button>
+                    <button class="modal-btn btn-copy-all" id="copy-all-btn">
+                        <i class="fas fa-copy"></i> Copiar Todo
+                    </button>
+                    <button class="modal-btn btn-close-modal" id="close-modal-btn">
+                        <i class="fas fa-times"></i> Cerrar
+                    </button>
+                </div>
             </div>
         </div>
     </div>
     
-    <div class="copied-message" id="copiedMessage">
-        <i class="fas fa-check-circle"></i>
-        <span>¡Copiado!</span>
+    <!-- Notificación -->
+    <div class="notification" id="notification">
+        <div class="notification-content">
+            <i class="fas fa-check-circle"></i>
+            <span id="notification-text">¡Contraseña copiada al portapapeles!</span>
+        </div>
     </div>
     
     <!-- JavaScript -->
